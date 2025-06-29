@@ -105,6 +105,10 @@ export default function TetrisGame() {
 
   const [bgmAudio, setBgmAudio] = useState<HTMLAudioElement | null>(null);
 
+  // 광고 영역 참조
+  const adRef = useRef<HTMLDivElement>(null);
+  const bottomAdRef = useRef<HTMLDivElement>(null);
+
   // 7-bag 랜덤 생성 시스템 (더 공정한 조각 분배)
   const createRandomPiece = useCallback((): Tetromino => {
     if (bagRef.current.length === 0) {
@@ -606,8 +610,45 @@ export default function TetrisGame() {
 
   const isEmptyCell = (cell: BoardCell) => !cell;
 
+  useEffect(() => {
+    // 광고 스크립트 동적 삽입 (상단)
+    if (adRef.current && !adRef.current.querySelector('ins')) {
+      const ins = document.createElement('ins');
+      ins.className = 'kakao_ad_area';
+      ins.style.display = 'block';
+      ins.setAttribute('data-ad-unit', 'DAN-L20xzJ2iWK1HTCEE');
+      ins.setAttribute('data-ad-width', '100%');
+      ins.setAttribute('data-ad-height', '50');
+      adRef.current.appendChild(ins);
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+      script.async = true;
+      adRef.current.appendChild(script);
+    }
+    // 하단 광고 스크립트 동적 삽입
+    if (bottomAdRef.current && !bottomAdRef.current.querySelector('ins')) {
+      const ins = document.createElement('ins');
+      ins.className = 'kakao_ad_area';
+      ins.style.display = 'block';
+      ins.setAttribute('data-ad-unit', 'DAN-yaHIZPIM4uoqeVpa');
+      ins.setAttribute('data-ad-width', '100%');
+      ins.setAttribute('data-ad-height', '50');
+      bottomAdRef.current.appendChild(ins);
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = '//t1.daumcdn.net/kas/static/ba.min.js';
+      script.async = true;
+      bottomAdRef.current.appendChild(script);
+    }
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center p-4 bg-black min-h-screen text-white">
+      {/* 광고 영역 - 게임 전체 UI와 동일한 flex row 구조 */}
+      <div className="w-full flex justify-center">
+        <div ref={adRef} className="w-full mb-6" style={{ minHeight: 50, maxWidth: '100%' }} />
+      </div>
       <h1
         className="text-4xl md:text-5xl font-extrabold mb-4 whitespace-nowrap tracking-widest bg-gradient-to-r from-[#FF3B30] via-[#FF9500] via-[#FFCC00] via-[#34C759] via-[#007AFF] via-[#5856D6] to-[#D6A4FF] bg-clip-text text-transparent"
         style={{
@@ -623,8 +664,7 @@ export default function TetrisGame() {
       >
         TETILESS
       </h1>
-      
-      <div className="flex gap-2 items-center justify-start">
+      <div className="flex gap-2 items-center justify-start w-full max-w-5xl mx-auto">
         {/* 게임 보드 */}
         <div className="relative ml-4">
           <div className="mx-auto w-full max-w-md border-8 border-gray-400 rounded-2xl p-1 bg-black shadow-[0_0_40px_10px_rgba(34,197,94,0.5)]">
@@ -792,6 +832,10 @@ export default function TetrisGame() {
       
       {/* tailwind purge 방지용 더미 */}
       <div className="hidden border-cyan-600 border-blue-500 from-cyan-600 to-cyan-300 from-blue-600 to-blue-300"></div>
+      {/* 하단 배너 광고 - 게임 전체 UI와 동일한 flex row 구조 */}
+      <div className="w-full flex justify-center mt-8">
+        <div ref={bottomAdRef} className="w-full" style={{ minHeight: 50, maxWidth: '100%' }} />
+      </div>
     </div>
   );
 }
