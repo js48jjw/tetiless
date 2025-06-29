@@ -644,13 +644,13 @@ export default function TetrisGame() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 bg-black min-h-screen text-white">
-      {/* 광고 영역 - 게임 전체 UI와 동일한 flex row 구조 */}
-      <div className="w-full flex justify-center">
-        <div ref={adRef} className="w-full mb-6" style={{ minHeight: 50, maxWidth: '100%' }} />
+    <div className="flex flex-col items-center justify-center p-4 bg-black min-h-screen text-white" style={{paddingTop: 58, paddingBottom: 58}}>
+      {/* 상단 고정 광고 */}
+      <div className="fixed top-0 left-0 w-full flex justify-center z-50">
+        <div ref={adRef} className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mb-0" style={{ minHeight: 50 }} />
       </div>
       <h1
-        className="text-4xl md:text-5xl font-extrabold mb-4 whitespace-nowrap tracking-widest bg-gradient-to-r from-[#FF3B30] via-[#FF9500] via-[#FFCC00] via-[#34C759] via-[#007AFF] via-[#5856D6] to-[#D6A4FF] bg-clip-text text-transparent"
+        className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 whitespace-nowrap tracking-widest bg-gradient-to-r from-[#FF3B30] via-[#FF9500] via-[#FFCC00] via-[#34C759] via-[#007AFF] via-[#5856D6] to-[#D6A4FF] bg-clip-text text-transparent"
         style={{
           textShadow: `
             0 2px 0 #3b0764,
@@ -664,7 +664,7 @@ export default function TetrisGame() {
       >
         TETILESS
       </h1>
-      <div className="flex gap-2 items-center justify-start w-full max-w-5xl mx-auto">
+      <div className="flex gap-2 items-center justify-center max-w-5xl mx-auto">
         {/* 게임 보드 */}
         <div className="relative ml-4">
           <div className="mx-auto w-full max-w-md border-8 border-gray-400 rounded-2xl p-1 bg-black shadow-[0_0_40px_10px_rgba(34,197,94,0.5)]">
@@ -832,9 +832,9 @@ export default function TetrisGame() {
       
       {/* tailwind purge 방지용 더미 */}
       <div className="hidden border-cyan-600 border-blue-500 from-cyan-600 to-cyan-300 from-blue-600 to-blue-300"></div>
-      {/* 하단 배너 광고 - 게임 전체 UI와 동일한 flex row 구조 */}
-      <div className="w-full flex justify-center mt-8">
-        <div ref={bottomAdRef} className="w-full" style={{ minHeight: 50, maxWidth: '100%' }} />
+      {/* 하단 고정 광고 */}
+      <div className="fixed bottom-0 left-0 w-full flex justify-center z-50">
+        <div ref={bottomAdRef} className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl" style={{ minHeight: 50 }} />
       </div>
     </div>
   );
