@@ -664,9 +664,9 @@ export default function TetrisGame() {
       >
         TETILESS
       </h1>
-      <div className="flex gap-2 items-center justify-center max-w-5xl mx-auto">
+      <div className="flex gap-4 items-center justify-center max-w-5xl mx-auto">
         {/* 게임 보드 */}
-        <div className="relative ml-4">
+        <div className="relative">
           <div className="mx-auto w-full max-w-md border-8 border-gray-400 rounded-2xl p-1 bg-black shadow-[0_0_40px_10px_rgba(34,197,94,0.5)]">
             <div
               className="aspect-[10/20] max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg min-w-[200px] min-h-[400px] grid gap-0 bg-gray-900 p-0 overflow-hidden box-border"
@@ -789,7 +789,7 @@ export default function TetrisGame() {
       </div>
       
       {/* 모바일 컨트롤 */}
-      <div className="mt-8 w-full max-w-sm">
+      <div className="mt-2 w-full max-w-sm">
         <div className="grid grid-cols-4 gap-3">
           {/* 왼쪽 이동 */}
           <button
