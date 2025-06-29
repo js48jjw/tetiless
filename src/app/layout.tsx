@@ -28,6 +28,7 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" type="image/png" href="/icons/icon_192x192.png" />
+        <link rel="icon" href="/favicon.ico" />
         <meta name="theme-color" content="#06b6d4" />
       </head>
       <body
