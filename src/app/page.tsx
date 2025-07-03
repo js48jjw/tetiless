@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
-// 타입 정의 추가
+// Add type definitions
 interface Tetromino {
   shape: number[][];
   color: string;
   key?: string;
 }
 
-// BoardCell 타입 확장
+// BoardCell type extension
 type BoardCell = string | 0 | { color: string; isFalling?: boolean };
 type Board = BoardCell[][];
 type Position = { x: number; y: number };
@@ -28,7 +28,7 @@ const TETROMINOS: Record<string, Omit<Tetromino, 'key'>> = {
 
 const TETROMINO_KEYS = Object.keys(TETROMINOS);
 
-// 점수 계산 개선
+// Score calculation improvement
 const POINTS = {
   SINGLE: 100,
   DOUBLE: 300,
@@ -38,7 +38,7 @@ const POINTS = {
   HARD_DROP: 2
 };
 
-// 효과음 파일 경로
+// Sound file path
 const SOUND = {
   move: '/sound/move.mp3',
   rotate: '/sound/rotate.mp3',
@@ -49,10 +49,10 @@ const SOUND = {
   gameover: '/sound/gameover.mp3',
 };
 
-// BGM만 캐싱, 효과음은 매번 새로 생성
+// Only BGM is cached, effects are created every time
 const bgmCache: Record<string, HTMLAudioElement> = {};
 function safePlaySound(src: string, volume = 1, loop = false) {
-  // BGM만 캐싱
+  // Only BGM is cached
   if (src === SOUND.bgm) {
     if (!bgmCache[src]) {
       bgmCache[src] = new Audio(src);
@@ -62,23 +62,23 @@ function safePlaySound(src: string, volume = 1, loop = false) {
     audio.loop = loop;
     audio.play().catch((e) => {
       if (e.name === 'AbortError') return;
-      console.error('오디오 재생 에러:', src, e);
+      console.error('Audio playback error:', src, e);
     });
     return audio;
   } else {
-    // 효과음은 매번 새로 생성
+    // Effects are created every time
     const audio = new Audio(src);
     audio.volume = volume;
     audio.loop = loop;
     audio.play().catch((e) => {
       if (e.name === 'AbortError') return;
-      console.error('오디오 재생 에러:', src, e);
+      console.error('Audio playback error:', src, e);
     });
     return audio;
   }
 }
 
-// 2. 점수/레벨/효과음 유틸 함수 분리 (컴포넌트 외부)
+// 2. Score/Level/Effect utility function separation (outside component)
 function calcLevel(lines: number, startLevel: number = 1) {
   return Math.floor(lines / 10) + (startLevel - 1) + 1;
 }
@@ -100,13 +100,13 @@ export default function TetrisGame() {
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [startLevel, setStartLevel] = useState<number>(1);
   
-  // 7-bag 시스템을 위한 상태
+  // 7-bag system state
   const bagRef = useRef<string[]>([]);
 
   const [bgmAudio, setBgmAudio] = useState<HTMLAudioElement | null>(null);
   const [isBgmMuted, setIsBgmMuted] = useState<boolean>(false);
 
-  // 광고 영역 참조
+  // Ad area reference
   const adRef = useRef<HTMLDivElement>(null);
   const bottomAdRef = useRef<HTMLDivElement>(null);
 
@@ -120,7 +120,7 @@ export default function TetrisGame() {
     return () => window.removeEventListener('resize', checkHeight);
   }, []);
 
-  // 7-bag 랜덤 생성 시스템 (더 공정한 조각 분배)
+  // 7-bag random generation system (fairer piece distribution)
   const createRandomPiece = useCallback((): Tetromino => {
     if (bagRef.current.length === 0) {
       bagRef.current = [...TETROMINO_KEYS].sort(() => Math.random() - 0.5);
@@ -173,13 +173,13 @@ export default function TetrisGame() {
     return newBoard;
   };
 
-  // 1. animateLineClear 먼저 선언
+  // 1. Declare animateLineClear first
   const animateLineClear = useCallback(async (rows: number[], newBoard: Board) => {
     setClearingRows(rows);
     setIsClearing(true);
     setLineClearX(0);
     setHardDropTrail([]);
-    const interval = 40; // ms, 한 칸씩 넘어가는 속도
+    const interval = 40; // ms, speed per cell
     for (let x = 0; x <= BOARD_WIDTH; x++) {
       setLineClearX(x);
       await new Promise(res => setTimeout(res, interval));
@@ -190,7 +190,7 @@ export default function TetrisGame() {
     setBoard(newBoard);
   }, []);
 
-  // 2. clearLines 함수
+  // 2. clearLines function
   const clearLines = (board: Board): { board: Board; clearedLines: number; clearedRowIdxs: number[] } => {
     const clearedRowIdxs: number[] = [];
     const newBoard = board.filter((row: BoardCell[], idx) => {
@@ -203,7 +203,7 @@ export default function TetrisGame() {
     return { board: [...emptyRows, ...newBoard], clearedLines, clearedRowIdxs };
   };
 
-  // 3. spawnNewPiece 함수
+  // 3. spawnNewPiece function
   const spawnNewPiece = useCallback(() => {
     const piece = nextPiece || createRandomPiece();
     const newNextPiece = createRandomPiece();
@@ -217,7 +217,7 @@ export default function TetrisGame() {
     return { piece, startPos };
   }, [nextPiece, createRandomPiece]);
 
-  // 4. finishHardDrop useCallback으로 감싸고, ref로 외부에서 참조할 수 있게 함
+  // 4. Wrap finishHardDrop with useCallback, reference externally with ref
   const finishHardDropRef = useRef<((newY: number, dropDistance: number) => void) | null>(null);
   const finishHardDrop = useCallback((newY: number, dropDistance: number) => {
     setScore(prev => prev + dropDistance * POINTS.HARD_DROP);
@@ -254,7 +254,7 @@ export default function TetrisGame() {
   }, [board, currentPiece, currentPosition, level, lines, spawnNewPiece, animateLineClear, startLevel]);
   finishHardDropRef.current = finishHardDrop;
 
-  // 3. BGM 관리 개선 (useEffect 내부)
+  // 3. BGM management improvement (inside useEffect)
   useEffect(() => {
     if (gameStarted && !gameOver && !isPaused) {
       if (!bgmAudio) {
@@ -274,10 +274,10 @@ export default function TetrisGame() {
     };
   }, [gameStarted, gameOver, isPaused, bgmAudio]);
 
-  // 연속 이동을 위한 interval ref 추가
+  // Add interval ref for continuous movement
   const moveIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
-  // 이동
+  // Move
   const movePiece = useCallback((dx: number, dy: number, isPlayerMove = false) => {
     if (!currentPiece || gameOver || isPaused || isClearing) return false;
     const newPos = { x: currentPosition.x + dx, y: currentPosition.y + dy };
@@ -324,12 +324,12 @@ export default function TetrisGame() {
     return false;
   }, [currentPiece, currentPosition, board, gameOver, isPaused, level, lines, spawnNewPiece, isClearing, animateLineClear, startLevel]);
 
-  // rotatePieceHandler 함수를 먼저 선언
+  // Declare rotatePieceHandler first
   const rotatePieceHandler = useCallback(() => {
     if (!currentPiece || gameOver || isPaused) return;
     const rotatedPiece = rotatePiece(currentPiece);
     
-    // 벽 킥 시도 (기본 위치, 왼쪽, 오른쪽, 위로 이동)
+    // Try wall kick (default, left, right, up)
     const wallKicks = [
       { x: 0, y: 0 },
       { x: -1, y: 0 },
@@ -353,18 +353,18 @@ export default function TetrisGame() {
     }
   }, [currentPiece, board, currentPosition, gameOver, isPaused]);
 
-  // 그 다음에 handleRotate 함수 선언
+  // Then declare handleRotate function
   const handleRotate = useCallback(() => {
     if (!currentPiece || gameOver || isPaused) return;
     
-    // 연속 이동 중에도 회전이 가능하도록
+    // Allow rotation during continuous movement
     rotatePieceHandler();
     
-    // 회전 효과음
+    // Rotate sound effect
     safePlaySound(SOUND.rotate, 0.5);
   }, [currentPiece, gameOver, isPaused, rotatePieceHandler]);
 
-  // 하드드랍 잔상 상태
+  // Hard drop trail state
   const [hardDropTrail, setHardDropTrail] = useState<{y: number, x: number, idx: number}[]>([]);
 
   const dropPiece = useCallback(() => {
@@ -714,13 +714,13 @@ export default function TetrisGame() {
           {gameOver && (
             <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center">
               <div className="text-center">
-                <h2 className="text-4xl md:text-5xl font-extrabold text-red-400 mb-4 drop-shadow-lg animate-pulse">게임 오버!</h2>
-                <p className="text-lg mb-2">점수: {score.toLocaleString()}</p>
+                <h2 className="text-4xl md:text-5xl font-extrabold text-red-400 mb-4 drop-shadow-lg animate-pulse">Game Over!</h2>
+                <p className="text-lg mb-2">Score: {score.toLocaleString()}</p>
                 <button
                   onClick={startGame}
                   className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded font-bold"
                 >
-                  다시 시작
+                  Restart
                 </button>
               </div>
             </div>
@@ -730,7 +730,7 @@ export default function TetrisGame() {
           {isPaused && gameStarted && !gameOver && (
             <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center">
               <div className="text-center">
-                <h2 className="text-4xl font-bold text-yellow-400 mb-2">일시정지</h2>
+                <h2 className="text-4xl font-bold text-yellow-400 mb-2">Pause</h2>
               </div>
             </div>
           )}
@@ -738,54 +738,54 @@ export default function TetrisGame() {
         
         {/* 오른쪽 패널 - 게임 정보 */}
         <div className="space-y-4">
-          {/* NEXT 블록 미리보기 - 제일 위로 이동 */}
+          {/* NEXT block preview - move to the top */}
           <div className="bg-gray-800 p-1 rounded text-center">
             <h3 className="text-sm font-bold mb-0 whitespace-nowrap">NEXT</h3>
             <div className="flex justify-center">
               {renderPiecePreview(nextPiece, 'w-16 h-13')}
             </div>
           </div>
-          {/* NEXT와 점수창 사이 간격 넓힘 */}
+          {/* Add space between NEXT and score */}
           <div className="mt-6" />
-          {/* 점수, 레벨, 라인 - 간격을 더 붙이고 일정하게 */}
+          {/* Score, Level, Lines - add more space and keep consistent */}
           <div className="flex flex-col space-y-1">
             <div className="bg-gray-800 p-1 rounded text-center">
-              <h3 className="text-sm font-bold whitespace-nowrap">점수</h3>
+              <h3 className="text-sm font-bold whitespace-nowrap">Score</h3>
               <p className="text-lg font-mono text-cyan-400 whitespace-nowrap">{score.toLocaleString()}</p>
             </div>
             <div className="bg-gray-800 p-1 rounded text-center">
-              <h3 className="text-sm font-bold whitespace-nowrap">레벨</h3>
+              <h3 className="text-sm font-bold whitespace-nowrap">Level</h3>
               <div className="flex items-center justify-center gap-0.5">
-                {/* ▼ 버튼 */}
+                {/* ▼ button */}
                 <button
                   type="button"
                   className="px-0.5 text-yellow-300 disabled:text-gray-500 focus:outline-none"
                   style={{ fontSize: '1.2em', lineHeight: 1 }}
                   onClick={() => setStartLevel((prev) => Math.max(1, prev - 1))}
                   disabled={gameStarted || startLevel <= 1}
-                  aria-label="레벨 내리기"
+                  aria-label="Decrease level"
                 >
                   ▼
                 </button>
-                {/* 레벨 숫자 */}
+                {/* Level number */}
                 <p className="text-lg font-mono text-yellow-400 whitespace-nowrap min-w-0 px-0 select-none">
                   {gameStarted ? level : startLevel}
                 </p>
-                {/* ▲ 버튼 */}
+                {/* ▲ button */}
                 <button
                   type="button"
                   className="px-0.5 text-yellow-300 disabled:text-gray-500 focus:outline-none"
                   style={{ fontSize: '1.2em', lineHeight: 1 }}
                   onClick={() => setStartLevel((prev) => Math.min(30, prev + 1))}
                   disabled={gameStarted || startLevel >= 30}
-                  aria-label="레벨 올리기"
+                  aria-label="Increase level"
                 >
                   ▲
                 </button>
               </div>
             </div>
             <div className="bg-gray-800 p-1 rounded text-center">
-              <h3 className="text-sm font-bold whitespace-nowrap">라인</h3>
+              <h3 className="text-sm font-bold whitespace-nowrap">Lines</h3>
               <p className="text-lg font-mono text-green-400 whitespace-nowrap">{lines}</p>
             </div>
           </div>
@@ -796,7 +796,7 @@ export default function TetrisGame() {
                 onClick={startGame}
                 className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 rounded font-bold whitespace-nowrap"
               >
-                게임 시작
+                Start Game
               </button>
             )}
             
@@ -806,7 +806,7 @@ export default function TetrisGame() {
                   onClick={togglePause}
                   className="w-full px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded font-bold whitespace-nowrap"
                 >
-                  {isPaused ? '계속하기' : '일시정지'}
+                  {isPaused ? 'Continue' : 'Pause'}
                 </button>
               </>
             )}
@@ -814,14 +814,14 @@ export default function TetrisGame() {
         </div>
       </div>
       
-      {/* tailwind purge 방지용 더미 */}
+      {/* dummy for tailwind purge */}
       <div className="hidden border-cyan-600 border-blue-500 from-cyan-600 to-cyan-300 from-blue-600 to-blue-300"></div>
       {isShortMobile ? (
         <>
-          {/* 모바일 컨트롤 */}
+          {/* Mobile controls */}
           <div className="mt-2 w-full max-w-sm">
             <div className="grid grid-cols-4 gap-3">
-              {/* 왼쪽 이동 */}
+              {/* Left movement */}
               <button
                 style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
                 onClick={() => movePiece(-1, 0, true)}
@@ -830,7 +830,7 @@ export default function TetrisGame() {
               >
                 ←
               </button>
-              {/* 오른쪽 이동 */}
+              {/* Right movement */}
               <button
                 style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
                 onClick={() => movePiece(1, 0, true)}
@@ -839,37 +839,37 @@ export default function TetrisGame() {
               >
                 →
               </button>
-              {/* 회전 버튼 */}
+              {/* Rotate button */}
               <button
                 style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
                 onClick={handleRotate}
                 className="col-span-1 h-16 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
                 disabled={!gameStarted || gameOver || isPaused}
               >
-                회전
+                Rotate
               </button>
-              {/* 하드 드롭 */}
+              {/* Hard drop */}
               <button
                 style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
                 onClick={dropPiece}
                 className="col-span-1 h-16 bg-red-600 hover:bg-red-700 active:bg-red-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
                 disabled={!gameStarted || gameOver || isPaused}
               >
-                드롭
+                Drop
               </button>
             </div>
           </div>
-          {/* 하단 고정 광고 */}
+          {/* Fixed bottom ad */}
           <div className="fixed bottom-0 left-0 w-full flex justify-center z-50">
             <div ref={bottomAdRef} className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl" style={{ minHeight: 50 }} />
           </div>
         </>
       ) : (
         <>
-          {/* 모바일 컨트롤 */}
+          {/* Mobile controls */}
           <div className="mt-2 w-full max-w-sm">
             <div className="grid grid-cols-4 gap-3">
-              {/* 왼쪽 이동 */}
+              {/* Left movement */}
               <button
                 style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
                 onClick={() => movePiece(-1, 0, true)}
@@ -878,7 +878,7 @@ export default function TetrisGame() {
               >
                 ←
               </button>
-              {/* 오른쪽 이동 */}
+              {/* Right movement */}
               <button
                 style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
                 onClick={() => movePiece(1, 0, true)}
@@ -887,27 +887,27 @@ export default function TetrisGame() {
               >
                 →
               </button>
-              {/* 회전 버튼 */}
+              {/* Rotate button */}
               <button
                 style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
                 onClick={handleRotate}
                 className="col-span-1 h-16 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
                 disabled={!gameStarted || gameOver || isPaused}
               >
-                회전
+                Rotate
               </button>
-              {/* 하드 드롭 */}
+              {/* Hard drop */}
               <button
                 style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
                 onClick={dropPiece}
                 className="col-span-1 h-16 bg-red-600 hover:bg-red-700 active:bg-red-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
                 disabled={!gameStarted || gameOver || isPaused}
               >
-                드롭
+                Drop
               </button>
             </div>
           </div>
-          {/* 하단 고정 광고 */}
+          {/* Fixed bottom ad */}
           <div className="fixed bottom-0 left-0 w-full flex justify-center z-50">
             <div ref={bottomAdRef} className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl" style={{ minHeight: 50 }} />
           </div>

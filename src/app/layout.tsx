@@ -34,7 +34,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         role="application"
-        aria-label="블록쌓기 게임 앱"
+        aria-label="Block Stacking Game App"
       >
         {children}
         <ServiceWorkerRegister />
