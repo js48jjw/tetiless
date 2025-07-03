@@ -754,7 +754,7 @@ export default function TetrisGame() {
               <p className="text-lg font-mono text-cyan-400 whitespace-nowrap">{score.toLocaleString()}</p>
             </div>
             <div className="bg-gray-800 p-1 rounded text-center">
-              <h3 className="text-sm font-bold whitespace-nowrap">Level</h3>
+              <h3 className="text-sm font-bold whitespace-nowrap">LV</h3>
               <div className="flex items-center justify-center gap-0.5">
                 {/* ▼ button */}
                 <button
@@ -796,7 +796,7 @@ export default function TetrisGame() {
                 onClick={startGame}
                 className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 rounded font-bold whitespace-nowrap"
               >
-                Start Game
+                Start
               </button>
             )}
             
@@ -806,7 +806,7 @@ export default function TetrisGame() {
                   onClick={togglePause}
                   className="w-full px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded font-bold whitespace-nowrap"
                 >
-                  {isPaused ? 'Continue' : 'Pause'}
+                  {isPaused ? 'GoGo' : 'Pause'}
                 </button>
               </>
             )}
@@ -846,7 +846,7 @@ export default function TetrisGame() {
                 className="col-span-1 h-16 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
                 disabled={!gameStarted || gameOver || isPaused}
               >
-                Rotate
+                Rot
               </button>
               {/* Hard drop */}
               <button
@@ -894,7 +894,7 @@ export default function TetrisGame() {
                 className="col-span-1 h-16 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
                 disabled={!gameStarted || gameOver || isPaused}
               >
-                Rotate
+                Rot
               </button>
               {/* Hard drop */}
               <button
