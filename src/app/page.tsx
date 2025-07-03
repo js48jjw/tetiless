@@ -104,10 +104,21 @@ export default function TetrisGame() {
   const bagRef = useRef<string[]>([]);
 
   const [bgmAudio, setBgmAudio] = useState<HTMLAudioElement | null>(null);
+  const [isBgmMuted, setIsBgmMuted] = useState<boolean>(false);
 
   // 광고 영역 참조
   const adRef = useRef<HTMLDivElement>(null);
   const bottomAdRef = useRef<HTMLDivElement>(null);
+
+  const [isShortMobile, setIsShortMobile] = useState(false);
+  useEffect(() => {
+    const checkHeight = () => {
+      setIsShortMobile(window.innerHeight <= 600);
+    };
+    checkHeight();
+    window.addEventListener('resize', checkHeight);
+    return () => window.removeEventListener('resize', checkHeight);
+  }, []);
 
   // 7-bag 랜덤 생성 시스템 (더 공정한 조각 분배)
   const createRandomPiece = useCallback((): Tetromino => {
@@ -400,7 +411,7 @@ export default function TetrisGame() {
   // togglePause useCallback으로 감싸기
   const togglePause = useCallback(() => {
     if (gameOver) return;
-    setIsPaused((prev) => !prev);
+    setIsPaused((prev: boolean) => !prev);
   }, [gameOver]);
 
   // 3. 키보드 이벤트 등록 useCallback으로 핸들러 고정
@@ -440,6 +451,15 @@ export default function TetrisGame() {
         e.preventDefault();
         togglePause();
         break;
+      case 'Escape':
+        e.preventDefault();
+        togglePause();
+        break;
+      case 'm':
+      case 'M':
+        e.preventDefault();
+        setIsBgmMuted((prev: boolean) => !prev);
+        break;
     }
   }, [gameStarted, movePiece, handleRotate, dropPiece, togglePause]);
 
@@ -451,7 +471,7 @@ export default function TetrisGame() {
   // 4. 게임 루프 setTimeout으로 변경
   useEffect(() => {
     if (!gameStarted || gameOver || isPaused) return;
-    let timer: NodeJS.Timeout;
+    let timer: number;
     // 레벨별 속도 조정: 1~9레벨은 100ms씩, 10레벨부터는 10ms씩, 최소 50ms
     let dropInterval = 1000;
     if (level <= 9) {
@@ -461,9 +481,9 @@ export default function TetrisGame() {
     }
     const loop = () => {
       movePiece(0, 1);
-      timer = setTimeout(loop, dropInterval);
+      timer = window.setTimeout(loop, dropInterval);
     };
-    timer = setTimeout(loop, dropInterval);
+    timer = window.setTimeout(loop, dropInterval);
     return () => clearTimeout(timer);
   }, [movePiece, level, gameStarted, gameOver, isPaused]);
 
@@ -643,6 +663,12 @@ export default function TetrisGame() {
     }
   }, []);
 
+  useEffect(() => {
+    if (bgmAudio) {
+      bgmAudio.muted = isBgmMuted;
+    }
+  }, [bgmAudio, isBgmMuted]);
+
   return (
     <div className="flex flex-col items-center justify-center p-4 bg-black min-h-screen text-white" style={{paddingTop: 58, paddingBottom: 58}}>
       {/* 상단 고정 광고 */}
@@ -788,57 +814,111 @@ export default function TetrisGame() {
         </div>
       </div>
       
-      {/* 모바일 컨트롤 */}
-      <div className="mt-2 w-full max-w-sm">
-        <div className="grid grid-cols-4 gap-3">
-          {/* 왼쪽 이동 */}
-          <button
-            style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
-            onClick={() => movePiece(-1, 0, true)}
-            className="col-span-1 h-16 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
-            disabled={!gameStarted || gameOver || isPaused}
-          >
-            ←
-          </button>
-          {/* 오른쪽 이동 */}
-          <button
-            style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
-            onClick={() => movePiece(1, 0, true)}
-            className="col-span-1 h-16 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
-            disabled={!gameStarted || gameOver || isPaused}
-          >
-            →
-          </button>
-          {/* 회전 버튼 */}
-          <button
-            style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
-            onClick={handleRotate}
-            className="col-span-1 h-16 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
-            disabled={!gameStarted || gameOver || isPaused}
-          >
-            회전
-          </button>
-          {/* 하드 드롭 */}
-          <button
-            style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
-            onClick={dropPiece}
-            className="col-span-1 h-16 bg-red-600 hover:bg-red-700 active:bg-red-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
-            disabled={!gameStarted || gameOver || isPaused}
-          >
-            드롭
-          </button>
-        </div>
-      </div>
-      
       {/* tailwind purge 방지용 더미 */}
       <div className="hidden border-cyan-600 border-blue-500 from-cyan-600 to-cyan-300 from-blue-600 to-blue-300"></div>
-      {/* 하단 고정 광고 */}
-      <div className="fixed bottom-0 left-0 w-full flex justify-center z-50">
-        <div ref={bottomAdRef} className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl" style={{ minHeight: 50 }} />
-      </div>
+      {isShortMobile ? (
+        <>
+          {/* 모바일 컨트롤 */}
+          <div className="mt-2 w-full max-w-sm">
+            <div className="grid grid-cols-4 gap-3">
+              {/* 왼쪽 이동 */}
+              <button
+                style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
+                onClick={() => movePiece(-1, 0, true)}
+                className="col-span-1 h-16 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
+                disabled={!gameStarted || gameOver || isPaused}
+              >
+                ←
+              </button>
+              {/* 오른쪽 이동 */}
+              <button
+                style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
+                onClick={() => movePiece(1, 0, true)}
+                className="col-span-1 h-16 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
+                disabled={!gameStarted || gameOver || isPaused}
+              >
+                →
+              </button>
+              {/* 회전 버튼 */}
+              <button
+                style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
+                onClick={handleRotate}
+                className="col-span-1 h-16 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
+                disabled={!gameStarted || gameOver || isPaused}
+              >
+                회전
+              </button>
+              {/* 하드 드롭 */}
+              <button
+                style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
+                onClick={dropPiece}
+                className="col-span-1 h-16 bg-red-600 hover:bg-red-700 active:bg-red-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
+                disabled={!gameStarted || gameOver || isPaused}
+              >
+                드롭
+              </button>
+            </div>
+          </div>
+          {/* 하단 고정 광고 */}
+          <div className="fixed bottom-0 left-0 w-full flex justify-center z-50">
+            <div ref={bottomAdRef} className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl" style={{ minHeight: 50 }} />
+          </div>
+        </>
+      ) : (
+        <>
+          {/* 모바일 컨트롤 */}
+          <div className="mt-2 w-full max-w-sm">
+            <div className="grid grid-cols-4 gap-3">
+              {/* 왼쪽 이동 */}
+              <button
+                style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
+                onClick={() => movePiece(-1, 0, true)}
+                className="col-span-1 h-16 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
+                disabled={!gameStarted || gameOver || isPaused}
+              >
+                ←
+              </button>
+              {/* 오른쪽 이동 */}
+              <button
+                style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
+                onClick={() => movePiece(1, 0, true)}
+                className="col-span-1 h-16 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
+                disabled={!gameStarted || gameOver || isPaused}
+              >
+                →
+              </button>
+              {/* 회전 버튼 */}
+              <button
+                style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
+                onClick={handleRotate}
+                className="col-span-1 h-16 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
+                disabled={!gameStarted || gameOver || isPaused}
+              >
+                회전
+              </button>
+              {/* 하드 드롭 */}
+              <button
+                style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
+                onClick={dropPiece}
+                className="col-span-1 h-16 bg-red-600 hover:bg-red-700 active:bg-red-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
+                disabled={!gameStarted || gameOver || isPaused}
+              >
+                드롭
+              </button>
+            </div>
+          </div>
+          {/* 하단 고정 광고 */}
+          <div className="fixed bottom-0 left-0 w-full flex justify-center z-50">
+            <div ref={bottomAdRef} className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl" style={{ minHeight: 50 }} />
+          </div>
+        </>
+      )}
     </div>
   );
 }
+
+
+
 
 
 
