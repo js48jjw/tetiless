@@ -670,10 +670,10 @@ export default function TetrisGame() {
   }, [bgmAudio, isBgmMuted]);
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 bg-black min-h-screen text-white" style={{paddingTop: 58, paddingBottom: 58}}>
+    <div className="flex flex-col items-center justify-center p-4 bg-black text-white min-h-screen" style={{paddingTop: 58, paddingBottom: 58}}>
       {/* 상단 고정 광고 */}
-      <div className="fixed top-0 left-0 w-full flex justify-center z-50">
-        <div ref={adRef} className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mb-0" style={{ minHeight: 50 }} />
+      <div className="fixed top-0 left-0 w-full flex justify-center z-50 bg-black text-white">
+        <div ref={adRef} className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mb-0 bg-black text-white" style={{ minHeight: 50 }} />
       </div>
       <h1
         className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 whitespace-nowrap tracking-widest bg-gradient-to-r from-[#FF3B30] via-[#FF9500] via-[#FFCC00] via-[#34C759] via-[#007AFF] via-[#5856D6] to-[#D6A4FF] bg-clip-text text-transparent"
@@ -690,9 +690,9 @@ export default function TetrisGame() {
       >
         TETILESS
       </h1>
-      <div className="flex gap-4 items-center justify-center max-w-5xl mx-auto">
+      <div className="flex gap-4 items-center justify-center max-w-5xl mx-auto bg-black text-white">
         {/* 게임 보드 */}
-        <div className="relative">
+        <div className="relative bg-black text-white">
           <div className="mx-auto w-full max-w-md border-8 border-gray-400 rounded-2xl p-1 bg-black shadow-[0_0_40px_10px_rgba(34,197,94,0.5)]">
             <div
               className="aspect-[10/20] max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg min-w-[200px] min-h-[400px] grid gap-0 bg-gray-900 p-0 overflow-hidden box-border"
@@ -737,7 +737,7 @@ export default function TetrisGame() {
         </div>
         
         {/* 오른쪽 패널 - 게임 정보 */}
-        <div className="space-y-4">
+        <div className="space-y-4 bg-black text-white">
           {/* NEXT block preview - move to the top */}
           <div className="bg-gray-800 p-1 rounded text-center">
             <h3 className="text-sm font-bold mb-0 whitespace-nowrap">NEXT</h3>
