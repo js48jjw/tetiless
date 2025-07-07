@@ -707,6 +707,31 @@ export default function TetrisGame() {
                   />
                 ))
               )}
+              {/* 게임 오버 오버레이: 게임 보드 내부에만 표시 */}
+              {gameOver && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80 z-20">
+                  <h2 className="text-3xl font-bold text-red-500 mb-3">Game Over</h2>
+                  <p className="text-xl text-white mb-2">Score: {score.toLocaleString()}</p>
+                  <button
+                    onClick={startGame}
+                    className="mt-3 px-5 py-2 bg-green-600 hover:bg-green-700 rounded font-bold text-white"
+                  >
+                    Again
+                  </button>
+                </div>
+              )}
+              {/* 일시정지 오버레이: 게임 보드 내부에만 표시 */}
+              {isPaused && gameStarted && !gameOver && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-70 z-20">
+                  <h2 className="text-4xl font-bold text-yellow-300 mb-3">Pause</h2>
+                  <button
+                    onClick={togglePause}
+                    className="mt-3 px-5 py-2 bg-yellow-500 hover:bg-yellow-600 rounded font-bold text-white"
+                  >
+                    Continue
+                  </button>
+                </div>
+              )}
             </div>
           </div>
           {/* (게임창 바로 아래 좌우 버튼 영역 삭제) */}
@@ -769,14 +794,14 @@ export default function TetrisGame() {
               <>
                 <button
                   onClick={startGame}
-                  className="w-11/12 px-4 py-2 bg-green-600 hover:bg-green-700 rounded font-bold whitespace-nowrap"
+                  className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 rounded font-bold whitespace-nowrap"
                 >
                   Start
                 </button>
                 {/* ROT 버튼을 Start 아래에 항상 표시 */}
                 <button
                   onClick={handleRotate}
-                  className="w-11/12 h-16 bg-blue-600 hover:bg-blue-700 rounded font-bold whitespace-nowrap mt-2"
+                  className="w-full h-16 bg-blue-600 hover:bg-blue-700 rounded font-bold whitespace-nowrap mt-2"
                   disabled={!gameStarted || gameOver}
                 >
                   Rotate
@@ -787,14 +812,14 @@ export default function TetrisGame() {
               <>
                 <button
                   onClick={togglePause}
-                  className="w-11/12 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded font-bold whitespace-nowrap"
+                  className="w-full px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded font-bold whitespace-nowrap"
                 >
                   {isPaused ? 'GoGo' : 'Pause'}
                 </button>
                 {/* ROT 버튼을 Pause/GoGo 아래에도 항상 표시 */}
                 <button
                   onClick={handleRotate}
-                  className="w-11/12 h-16 bg-blue-600 hover:bg-blue-700 rounded font-bold whitespace-nowrap mt-2"
+                  className="w-full h-16 bg-blue-600 hover:bg-blue-700 rounded font-bold whitespace-nowrap mt-2"
                   disabled={!gameStarted || gameOver || isPaused}
                 >
                   Rotate
