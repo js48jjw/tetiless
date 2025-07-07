@@ -676,7 +676,7 @@ export default function TetrisGame() {
         <div ref={adRef} className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mb-0 bg-black text-white" style={{ minHeight: 50 }} />
       </div>
       <h1
-        className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 whitespace-nowrap tracking-widest bg-gradient-to-r from-[#FF3B30] via-[#FF9500] via-[#FFCC00] via-[#34C759] via-[#007AFF] via-[#5856D6] to-[#D6A4FF] bg-clip-text text-transparent"
+        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 whitespace-nowrap tracking-widest bg-gradient-to-r from-[#FF3B30] via-[#FF9500] via-[#FFCC00] via-[#34C759] via-[#007AFF] via-[#5856D6] to-[#D6A4FF] bg-clip-text text-transparent"
         style={{
           textShadow: `
             0 2px 0 #3b0764,
@@ -690,7 +690,7 @@ export default function TetrisGame() {
       >
         TETILESS
       </h1>
-      <div className="flex gap-4 items-center justify-center max-w-5xl mx-auto bg-black text-white">
+      <div className="flex flex-row justify-center items-end gap-4 w-full max-w-4xl mx-auto">
         {/* 게임 보드 */}
         <div className="relative bg-black text-white">
           <div className="mx-auto w-full max-w-md border-8 border-gray-400 rounded-2xl p-1 bg-black shadow-[0_0_40px_10px_rgba(34,197,94,0.5)]">
@@ -709,51 +709,25 @@ export default function TetrisGame() {
               )}
             </div>
           </div>
-          
-          {/* 게임 오버 오버레이 */}
-          {gameOver && (
-            <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center">
-              <div className="text-center">
-                <h2 className="text-4xl md:text-5xl font-extrabold text-red-400 mb-4 drop-shadow-lg animate-pulse">Game Over!</h2>
-                <p className="text-lg mb-2">Score: {score.toLocaleString()}</p>
-                <button
-                  onClick={startGame}
-                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded font-bold"
-                >
-                  Restart
-                </button>
-              </div>
-            </div>
-          )}
-          
-          {/* 일시정지 오버레이 */}
-          {isPaused && gameStarted && !gameOver && (
-            <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center">
-              <div className="text-center">
-                <h2 className="text-4xl font-bold text-yellow-400 mb-2">Pause</h2>
-              </div>
-            </div>
-          )}
+          {/* (게임창 바로 아래 좌우 버튼 영역 삭제) */}
         </div>
         
         {/* 오른쪽 패널 - 게임 정보 */}
-        <div className="space-y-4 bg-black text-white">
+        <div className="space-y-4 bg-black text-white mt-0 flex flex-col items-center">
           {/* NEXT block preview - move to the top */}
-          <div className="bg-gray-800 p-1 rounded text-center">
+          <div className="bg-gray-800 p-1 rounded text-center mb-1">
             <h3 className="text-sm font-bold mb-0 whitespace-nowrap">NEXT</h3>
             <div className="flex justify-center">
               {renderPiecePreview(nextPiece, 'w-16 h-13')}
             </div>
           </div>
-          {/* Add space between NEXT and score */}
-          <div className="mt-6" />
           {/* Score, Level, Lines - add more space and keep consistent */}
-          <div className="flex flex-col space-y-1">
-            <div className="bg-gray-800 p-1 rounded text-center">
+          <div className="flex flex-col space-y-0 mt-0 pt-0">
+            <div className="bg-gray-800 p-1 rounded text-center mb-1">
               <h3 className="text-sm font-bold whitespace-nowrap">Score</h3>
               <p className="text-lg font-mono text-cyan-400 whitespace-nowrap">{score.toLocaleString()}</p>
             </div>
-            <div className="bg-gray-800 p-1 rounded text-center">
+            <div className="bg-gray-800 p-1 rounded text-center mb-1">
               <h3 className="text-sm font-bold whitespace-nowrap">LV</h3>
               <div className="flex items-center justify-center gap-0.5">
                 {/* ▼ button */}
@@ -784,7 +758,7 @@ export default function TetrisGame() {
                 </button>
               </div>
             </div>
-            <div className="bg-gray-800 p-1 rounded text-center">
+            <div className="bg-gray-800 p-1 rounded text-center mb-0">
               <h3 className="text-sm font-bold whitespace-nowrap">Lines</h3>
               <p className="text-lg font-mono text-green-400 whitespace-nowrap">{lines}</p>
             </div>
@@ -792,21 +766,38 @@ export default function TetrisGame() {
           
           <div className="space-y-2">
             {!gameStarted && (
-              <button
-                onClick={startGame}
-                className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 rounded font-bold whitespace-nowrap"
-              >
-                Start
-              </button>
+              <>
+                <button
+                  onClick={startGame}
+                  className="w-11/12 px-4 py-2 bg-green-600 hover:bg-green-700 rounded font-bold whitespace-nowrap"
+                >
+                  Start
+                </button>
+                {/* ROT 버튼을 Start 아래에 항상 표시 */}
+                <button
+                  onClick={handleRotate}
+                  className="w-11/12 h-16 bg-blue-600 hover:bg-blue-700 rounded font-bold whitespace-nowrap mt-2"
+                  disabled={!gameStarted || gameOver}
+                >
+                  Rotate
+                </button>
+              </>
             )}
-            
             {gameStarted && !gameOver && (
               <>
                 <button
                   onClick={togglePause}
-                  className="w-full px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded font-bold whitespace-nowrap"
+                  className="w-11/12 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded font-bold whitespace-nowrap"
                 >
                   {isPaused ? 'GoGo' : 'Pause'}
+                </button>
+                {/* ROT 버튼을 Pause/GoGo 아래에도 항상 표시 */}
+                <button
+                  onClick={handleRotate}
+                  className="w-11/12 h-16 bg-blue-600 hover:bg-blue-700 rounded font-bold whitespace-nowrap mt-2"
+                  disabled={!gameStarted || gameOver || isPaused}
+                >
+                  Rotate
                 </button>
               </>
             )}
@@ -820,12 +811,12 @@ export default function TetrisGame() {
         <>
           {/* Mobile controls */}
           <div className="mt-2 w-full max-w-sm">
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               {/* Left movement */}
               <button
                 style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
                 onClick={() => movePiece(-1, 0, true)}
-                className="col-span-1 h-16 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
+                className="col-span-1 h-16 w-24 ml-4 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap justify-self-start"
                 disabled={!gameStarted || gameOver || isPaused}
               >
                 ←
@@ -834,29 +825,22 @@ export default function TetrisGame() {
               <button
                 style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
                 onClick={() => movePiece(1, 0, true)}
-                className="col-span-1 h-16 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
+                className="col-span-1 h-16 w-24 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
                 disabled={!gameStarted || gameOver || isPaused}
               >
                 →
               </button>
-              {/* Rotate button */}
-              <button
-                style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
-                onClick={handleRotate}
-                className="col-span-1 h-16 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
-                disabled={!gameStarted || gameOver || isPaused}
-              >
-                Rot
-              </button>
-              {/* Hard drop */}
-              <button
-                style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
-                onClick={dropPiece}
-                className="col-span-1 h-16 bg-red-600 hover:bg-red-700 active:bg-red-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
-                disabled={!gameStarted || gameOver || isPaused}
-              >
-                Drop
-              </button>
+              {/* DROP만 세로 배치 */}
+              <div className="flex flex-col gap-2 col-span-1">
+                <button
+                  style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
+                  onClick={dropPiece}
+                  className="h-16 bg-red-600 hover:bg-red-700 active:bg-red-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
+                  disabled={!gameStarted || gameOver || isPaused}
+                >
+                  Drop
+                </button>
+              </div>
             </div>
           </div>
           {/* Fixed bottom ad */}
@@ -868,12 +852,12 @@ export default function TetrisGame() {
         <>
           {/* Mobile controls */}
           <div className="mt-2 w-full max-w-sm">
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               {/* Left movement */}
               <button
                 style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
                 onClick={() => movePiece(-1, 0, true)}
-                className="col-span-1 h-16 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
+                className="col-span-1 h-16 w-24 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap justify-self-start"
                 disabled={!gameStarted || gameOver || isPaused}
               >
                 ←
@@ -882,29 +866,22 @@ export default function TetrisGame() {
               <button
                 style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
                 onClick={() => movePiece(1, 0, true)}
-                className="col-span-1 h-16 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
+                className="col-span-1 h-16 w-24 bg-gray-600 hover:bg-gray-700 active:bg-gray-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
                 disabled={!gameStarted || gameOver || isPaused}
               >
                 →
               </button>
-              {/* Rotate button */}
-              <button
-                style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
-                onClick={handleRotate}
-                className="col-span-1 h-16 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
-                disabled={!gameStarted || gameOver || isPaused}
-              >
-                Rot
-              </button>
-              {/* Hard drop */}
-              <button
-                style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
-                onClick={dropPiece}
-                className="col-span-1 h-16 bg-red-600 hover:bg-red-700 active:bg-red-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
-                disabled={!gameStarted || gameOver || isPaused}
-              >
-                Drop
-              </button>
+              {/* DROP만 세로 배치 */}
+              <div className="flex flex-col gap-2 col-span-1">
+                <button
+                  style={{ userSelect: 'none', WebkitUserSelect: 'none', msUserSelect: 'none', touchAction: 'none' }}
+                  onClick={dropPiece}
+                  className="h-16 w-11/12 bg-red-600 hover:bg-red-700 active:bg-red-800 rounded-lg font-bold text-xl flex items-center justify-center touch-manipulation whitespace-nowrap"
+                  disabled={!gameStarted || gameOver || isPaused}
+                >
+                  Drop
+                </button>
+              </div>
             </div>
           </div>
           {/* Fixed bottom ad */}
