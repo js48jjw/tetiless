@@ -20,6 +20,36 @@ html, body {
   overflow: hidden;
 }
 
+/* Promo Banners */
+.promo-banner {
+  position: fixed;
+  top: 0;
+  width: 160px; /* 요청: 배너 폭 160 */
+  height: 100vh;
+  display: none; /* 기본은 숨김 (모바일) */
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+.promo-banner.left {
+  left: 0;
+}
+.promo-banner.right {
+  right: 0;
+}
+.promo-banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* 1100px 이상(PC)일 때만 보이도록 */
+@media (min-width: 1100px) {
+  .promo-banner {
+    display: flex;
+  }
+}
+
 /* 하드 드롭 애니메이션 */
 @keyframes tetris-fall {
   0% {
